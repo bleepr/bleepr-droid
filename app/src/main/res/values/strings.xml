@@ -18,4 +18,6 @@
     <string name="title_order_list">Orders</string>
     <string name="title_order_detail">Order Detail</string>
     <string name="action_refresh">Refresh</string>
+    <string name="title_activity_occupancies_list">OccupanciesListActivity</string>
+    <string name="action_settings">Settings</string>
 </resources>

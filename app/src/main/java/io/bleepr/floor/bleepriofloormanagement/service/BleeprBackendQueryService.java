@@ -3,6 +3,17 @@ package io.bleepr.floor.bleepriofloormanagement.service;
 import android.app.IntentService;
 import android.content.Intent;
 import android.content.Context;
+import android.os.Bundle;
+import android.support.v4.os.ResultReceiver;
+
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+
+import org.json.JSONObject;
+
+import io.bleepr.floor.bleepriofloormanagement.network.RequestQueueBox;
 
 /**
  * An {@link IntentService} subclass for handling asynchronous task requests in
@@ -12,14 +23,14 @@ import android.content.Context;
  * helper methods.
  */
 public class BleeprBackendQueryService extends IntentService {
-    // TODO: Rename actions, choose action names that describe tasks that this
     // IntentService can perform, e.g. ACTION_FETCH_NEW_ITEMS
-    private static final String ACTION_FOO = "io.bleepr.floor.bleepriofloormanagement.service.action.FOO";
-    private static final String ACTION_BAZ = "io.bleepr.floor.bleepriofloormanagement.service.action.BAZ";
+    private static final String ACTION_REFRESH = "io.bleepr.floor.bleepriofloormanagement.service.action.REFRESH";
 
-    // TODO: Rename parameters
-    private static final String EXTRA_PARAM1 = "io.bleepr.floor.bleepriofloormanagement.service.extra.PARAM1";
-    private static final String EXTRA_PARAM2 = "io.bleepr.floor.bleepriofloormanagement.service.extra.PARAM2";
+    private static final String EXTRA_CALLBACK = "io.bleepr.floor.bleepriofloormanagement.service.extra.CALLBACK";
+
+    private static final String TABLES_API_URL = "";
+    private static final String ORDERS_API_URL = "";
+    private static final String OCCUPANCIES_API_URL = "";
 
     /**
      * Starts this service to perform action Foo with the given parameters. If
@@ -28,26 +39,10 @@ public class BleeprBackendQueryService extends IntentService {
      * @see IntentService
      */
     // TODO: Customize helper method
-    public static void startActionFoo(Context context, String param1, String param2) {
+    public static void startRefresh(Context context, ResultReceiver callback) {
         Intent intent = new Intent(context, BleeprBackendQueryService.class);
-        intent.setAction(ACTION_FOO);
-        intent.putExtra(EXTRA_PARAM1, param1);
-        intent.putExtra(EXTRA_PARAM2, param2);
-        context.startService(intent);
-    }
-
-    /**
-     * Starts this service to perform action Baz with the given parameters. If
-     * the service is already performing a task this action will be queued.
-     *
-     * @see IntentService
-     */
-    // TODO: Customize helper method
-    public static void startActionBaz(Context context, String param1, String param2) {
-        Intent intent = new Intent(context, BleeprBackendQueryService.class);
-        intent.setAction(ACTION_BAZ);
-        intent.putExtra(EXTRA_PARAM1, param1);
-        intent.putExtra(EXTRA_PARAM2, param2);
+        intent.setAction(ACTION_REFRESH);
+        intent.putExtra(EXTRA_CALLBACK, callback);
         context.startService(intent);
     }
 
@@ -59,14 +54,9 @@ public class BleeprBackendQueryService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         if (intent != null) {
             final String action = intent.getAction();
-            if (ACTION_FOO.equals(action)) {
-                final String param1 = intent.getStringExtra(EXTRA_PARAM1);
-                final String param2 = intent.getStringExtra(EXTRA_PARAM2);
-                handleActionFoo(param1, param2);
-            } else if (ACTION_BAZ.equals(action)) {
-                final String param1 = intent.getStringExtra(EXTRA_PARAM1);
-                final String param2 = intent.getStringExtra(EXTRA_PARAM2);
-                handleActionBaz(param1, param2);
+            if (ACTION_REFRESH.equals(action)) {
+                final ResultReceiver callback = intent.getParcelableExtra(EXTRA_CALLBACK);
+                handleActionRefresh(callback);
             }
         }
     }
@@ -75,17 +65,51 @@ public class BleeprBackendQueryService extends IntentService {
      * Handle action Foo in the provided background thread with the provided
      * parameters.
      */
-    private void handleActionFoo(String param1, String param2) {
-        // TODO: Handle action Foo
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
+    private void handleActionRefresh(ResultReceiver callback) {
+        JsonObjectRequest tables = new JsonObjectRequest(Request.Method.GET, TABLES_API_URL, null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        int remoteID = 0;
+                        JsonObjectRequest occupancies = new JsonObjectRequest(Request.Method.GET, String.format(OCCUPANCIES_API_URL, remoteID), null,
+                                new Response.Listener<JSONObject>() {
+                                    @Override
+                                    public void onResponse(JSONObject response) {
 
-    /**
-     * Handle action Baz in the provided background thread with the provided
-     * parameters.
-     */
-    private void handleActionBaz(String param1, String param2) {
-        // TODO: Handle action Baz
-        throw new UnsupportedOperationException("Not yet implemented");
+                                    }
+                                },
+                                new Response.ErrorListener() {
+                                    @Override
+                                    public void onErrorResponse(VolleyError error) {
+
+                                    }
+                                }
+                        );
+
+                        JsonObjectRequest orders = new JsonObjectRequest(Request.Method.GET, String.format(ORDERS_API_URL, remoteID), null,
+                                new Response.Listener<JSONObject>() {
+                                    @Override
+                                    public void onResponse(JSONObject response) {
+
+                                    }
+                                },
+                                new Response.ErrorListener() {
+                                    @Override
+                                    public void onErrorResponse(VolleyError error) {
+
+                                    }
+                                }
+                        );
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+
+                    }
+                }
+        );
+
+        RequestQueueBox.getInstance(getApplicationContext()).addToRequestQueue(tables);
     }
 }

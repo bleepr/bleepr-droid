@@ -6,17 +6,32 @@
     android:paddingLeft="10dp"
     android:paddingRight="10dp">
 
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Occupied"
+            android:id="@+id/textView"
+            android:layout_row="0"
+            android:layout_column="0" />
+
+        <Button
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="View Occupancies"
+            android:id="@+id/button3"
+            android:layout_row="0"
+            android:layout_column="8"
+            android:onClick="viewOccupancies" />
+    </GridLayout>
+
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/imageView"
-        android:layout_gravity="center_horizontal" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="This table is not occupied"
-        android:id="@+id/textView" />
-
+        android:id="@+id/imageView" />
 </LinearLayout>

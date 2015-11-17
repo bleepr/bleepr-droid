@@ -9,9 +9,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import io.bleepr.floor.bleepriofloormanagement.OrderDetailFragment;
-import io.bleepr.floor.bleepriofloormanagement.OrderListFragment;
+import io.bleepr.floor.bleepriofloormanagement.fragment.OrderDetailFragment;
+import io.bleepr.floor.bleepriofloormanagement.fragment.OrderListFragment;
 import io.bleepr.floor.bleepriofloormanagement.R;
+import io.bleepr.floor.bleepriofloormanagement.service.BleeprBackendQueryService;
 
 
 /**
@@ -104,6 +105,7 @@ public class OrderListActivity extends AppCompatActivity
         switch(item.getItemId()) {
             case R.id.action_refresh:
                 // Kick off refresh
+                BleeprBackendQueryService.startRefresh(getApplicationContext(), null);
                 Toast.makeText(getApplicationContext(), "Refresh initiated", Toast.LENGTH_LONG).show();
                 return true;
             default:

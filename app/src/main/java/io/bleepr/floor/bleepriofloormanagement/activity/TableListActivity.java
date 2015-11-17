@@ -13,8 +13,9 @@ import android.view.View;
 import android.widget.Toast;
 
 import io.bleepr.floor.bleepriofloormanagement.R;
-import io.bleepr.floor.bleepriofloormanagement.TableDetailFragment;
-import io.bleepr.floor.bleepriofloormanagement.TableListFragment;
+import io.bleepr.floor.bleepriofloormanagement.fragment.TableDetailFragment;
+import io.bleepr.floor.bleepriofloormanagement.fragment.TableListFragment;
+import io.bleepr.floor.bleepriofloormanagement.service.BleeprBackendQueryService;
 
 
 /**
@@ -117,6 +118,7 @@ public class TableListActivity extends AppCompatActivity
         switch(item.getItemId()) {
             case R.id.action_refresh:
                 // Kick off refresh
+                BleeprBackendQueryService.startRefresh(getApplicationContext(), null);
                 Toast.makeText(getApplicationContext(), "Refresh initiated", Toast.LENGTH_LONG).show();
                 return true;
             default:

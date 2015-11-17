@@ -1,7 +1,11 @@
-<fragment xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:id="@+id/table_list"
-    android:name="io.bleepr.floor.bleepriofloormanagement.TableListFragment"
-    android:layout_width="match_parent" android:layout_height="match_parent"
-    android:layout_marginLeft="16dp" android:layout_marginRight="16dp"
-    tools:context="io.bleepr.floor.bleepriofloormanagement.TableListActivity"
-    tools:layout="@android:layout/list_content" />
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <fragment android:id="@+id/table_list"
+        android:name="io.bleepr.floor.bleepriofloormanagement.fragment.TableListFragment"
+        android:layout_width="match_parent" android:layout_height="match_parent"
+        android:layout_marginLeft="16dp" android:layout_marginRight="16dp"
+        tools:context="io.bleepr.floor.bleepriofloormanagement.activity.TableListActivity"
+        tools:layout="@android:layout/list_content" />
+</LinearLayout>

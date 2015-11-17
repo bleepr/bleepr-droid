@@ -4,7 +4,7 @@
     android:layout_marginRight="16dp" android:baselineAligned="false"
     android:divider="?android:attr/dividerHorizontal" android:orientation="horizontal"
     android:showDividers="middle"
-    tools:context="io.bleepr.floor.bleepriofloormanagement.OrderListActivity">
+    tools:context="io.bleepr.floor.bleepriofloormanagement.activity.OrderListActivity">
 
     <!--
     This layout is a two-pane layout for the Orders
@@ -13,7 +13,7 @@
     -->
 
     <fragment android:id="@+id/order_list"
-        android:name="io.bleepr.floor.bleepriofloormanagement.OrderListFragment"
+        android:name="io.bleepr.floor.bleepriofloormanagement.fragment.OrderListFragment"
         android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
         tools:layout="@android:layout/list_content" />
 

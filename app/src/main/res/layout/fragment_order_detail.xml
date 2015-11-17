@@ -38,7 +38,8 @@
             android:layout_height="wrap_content"
             android:text="Info"
             android:id="@+id/table_view"
-            android:layout_column="14" />
+            android:layout_column="14"
+            android:onClick="viewAssociatedTable" />
 
     </TableRow>
 

@@ -9,8 +9,9 @@ import android.support.design.widget.Snackbar;
 import android.view.View;
 import android.support.v4.app.NavUtils;
 import android.view.MenuItem;
+import android.widget.Toast;
 
-import io.bleepr.floor.bleepriofloormanagement.OrderDetailFragment;
+import io.bleepr.floor.bleepriofloormanagement.fragment.OrderDetailFragment;
 import io.bleepr.floor.bleepriofloormanagement.R;
 
 /**
@@ -81,5 +82,9 @@ public class OrderDetailActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void viewAssociatedTable(View view){
+        Toast.makeText(getApplicationContext(), "View associated table", Toast.LENGTH_LONG).show();
     }
 }

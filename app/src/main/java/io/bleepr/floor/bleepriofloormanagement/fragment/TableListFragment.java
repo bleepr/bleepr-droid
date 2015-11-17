@@ -1,13 +1,24 @@
 package io.bleepr.floor.bleepriofloormanagement.fragment;
 
 import android.app.Activity;
+import android.database.Cursor;
 import android.os.Bundle;
+import android.provider.BaseColumns;
 import android.support.v4.app.ListFragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
+import android.support.v4.widget.SimpleCursorAdapter;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 
 import io.bleepr.floor.bleepriofloormanagement.dummy.DummyContent;
+import io.bleepr.floor.bleepriofloormanagement.provider.BleeprConstants;
 
 /**
  * A list fragment representing a list of Tables. This fragment
@@ -18,7 +29,7 @@ import io.bleepr.floor.bleepriofloormanagement.dummy.DummyContent;
  * Activities containing this fragment MUST implement the {@link Callbacks}
  * interface.
  */
-public class TableListFragment extends ListFragment {
+public class TableListFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     /**
      * The serialization (saved instance state) Bundle key representing the
@@ -36,6 +47,27 @@ public class TableListFragment extends ListFragment {
      * The current activated item position. Only used on tablets.
      */
     private int mActivatedPosition = ListView.INVALID_POSITION;
+
+    private SimpleCursorAdapter cursorAdapter;
+
+    static final String[] PROJECTION = new String[] {BaseColumns._ID,
+            BleeprConstants.TABLES_NAME};
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return new CursorLoader(getActivity(), BleeprConstants.TABLES_CONTENT_URI,
+                PROJECTION, null, null, null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        cursorAdapter.swapCursor(data);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        cursorAdapter.swapCursor(null);
+    }
 
     /**
      * A callback interface that all activities containing this fragment must
@@ -70,17 +102,32 @@ public class TableListFragment extends ListFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // TODO: replace with a real list adapter.
-        setListAdapter(new ArrayAdapter<DummyContent.DummyItem>(
-                getActivity(),
+        cursorAdapter = new SimpleCursorAdapter(getActivity(),
                 android.R.layout.simple_list_item_activated_1,
-                android.R.id.text1,
-                DummyContent.ITEMS));
+                null,
+                new String[]{BleeprConstants.TABLES_NAME},
+                new int[]{android.R.id.text1}, 0);
+
+        setListAdapter(cursorAdapter);
+
+        getLoaderManager().initLoader(0, null, this);
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        // Create a progress bar to display while the list loads
+        ProgressBar progressBar = new ProgressBar(getActivity(), null, android.R.attr.progressBarStyleLarge);
+        progressBar.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT, Gravity.CENTER));
+        progressBar.setIndeterminate(true);
+        getListView().setEmptyView(progressBar);
+
+        // Must add the progress bar to the root of the layout
+        ViewGroup root = (ViewGroup) view;
+        root.addView(progressBar);
+
 
         // Restore the previously serialized activated item position.
         if (savedInstanceState != null

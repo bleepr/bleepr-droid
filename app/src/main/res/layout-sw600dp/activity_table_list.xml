@@ -4,7 +4,7 @@
     android:layout_marginRight="16dp" android:baselineAligned="false"
     android:divider="?android:attr/dividerHorizontal" android:orientation="horizontal"
     android:showDividers="middle"
-    tools:context="io.bleepr.floor.bleepriofloormanagement.TableListActivity">
+    tools:context="io.bleepr.floor.bleepriofloormanagement.activity.TableListActivity">
 
     <!--
     This layout is a two-pane layout for the Tables
@@ -13,7 +13,7 @@
     -->
 
     <fragment android:id="@+id/table_list"
-        android:name="io.bleepr.floor.bleepriofloormanagement.TableListFragment"
+        android:name="io.bleepr.floor.bleepriofloormanagement.fragment.TableListFragment"
         android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
         tools:layout="@android:layout/list_content" />
 
