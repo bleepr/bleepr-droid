@@ -91,13 +91,13 @@ public class TableListActivity extends AppCompatActivity
      * indicating that the item with the given ID was selected.
      */
     @Override
-    public void onItemSelected(String id) {
+    public void onItemSelected(int id) {
         if (mTwoPane) {
             // In two-pane mode, show the detail view in this activity by
             // adding or replacing the detail fragment using a
             // fragment transaction.
             Bundle arguments = new Bundle();
-            arguments.putString(TableDetailFragment.ARG_ITEM_ID, id);
+            arguments.putInt(TableDetailFragment.ARG_ITEM_ID, id);
             TableDetailFragment fragment = new TableDetailFragment();
             fragment.setArguments(arguments);
             getSupportFragmentManager().beginTransaction()

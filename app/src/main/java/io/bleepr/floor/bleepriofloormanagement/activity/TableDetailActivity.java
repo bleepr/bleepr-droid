@@ -23,6 +23,8 @@ import io.bleepr.floor.bleepriofloormanagement.fragment.TableDetailFragment;
  */
 public class TableDetailActivity extends AppCompatActivity {
 
+    private int tableId;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,8 +48,8 @@ public class TableDetailActivity extends AppCompatActivity {
             // Create the detail fragment and add it to the activity
             // using a fragment transaction.
             Bundle arguments = new Bundle();
-            arguments.putString(TableDetailFragment.ARG_ITEM_ID,
-                    getIntent().getStringExtra(TableDetailFragment.ARG_ITEM_ID));
+            tableId = getIntent().getIntExtra(TableDetailFragment.ARG_ITEM_ID, -1);
+            arguments.putInt(TableDetailFragment.ARG_ITEM_ID, tableId);
             TableDetailFragment fragment = new TableDetailFragment();
             fragment.setArguments(arguments);
             getSupportFragmentManager().beginTransaction()
@@ -75,6 +77,7 @@ public class TableDetailActivity extends AppCompatActivity {
 
     public void viewOccupancies(View view){
         Intent tablesIntent = new Intent(this, OccupanciesListActivity.class);
+        tablesIntent.putExtra(OrderListActivity.EXTRA_TABLE_ID, tableId);
         startActivity(tablesIntent);
     }
 }

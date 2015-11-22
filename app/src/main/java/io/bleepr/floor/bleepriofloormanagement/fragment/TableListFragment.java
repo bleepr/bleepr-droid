@@ -51,7 +51,7 @@ public class TableListFragment extends ListFragment implements LoaderManager.Loa
     private SimpleCursorAdapter cursorAdapter;
 
     static final String[] PROJECTION = new String[] {BaseColumns._ID,
-            BleeprConstants.TABLES_NAME};
+            BleeprConstants.TABLES_NAME, BleeprConstants.TABLES_REMOTE_ID};
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
@@ -78,7 +78,7 @@ public class TableListFragment extends ListFragment implements LoaderManager.Loa
         /**
          * Callback for when an item has been selected.
          */
-        public void onItemSelected(String id);
+        public void onItemSelected(int id);
     }
 
     /**
@@ -87,7 +87,7 @@ public class TableListFragment extends ListFragment implements LoaderManager.Loa
      */
     private static Callbacks sDummyCallbacks = new Callbacks() {
         @Override
-        public void onItemSelected(String id) {
+        public void onItemSelected(int id) {
         }
     };
 
@@ -160,9 +160,12 @@ public class TableListFragment extends ListFragment implements LoaderManager.Loa
     public void onListItemClick(ListView listView, View view, int position, long id) {
         super.onListItemClick(listView, view, position, id);
 
+        Cursor cur = (Cursor)getListAdapter().getItem(position);
+        int table = cur.getInt(cur.getColumnIndex(BleeprConstants.TABLES_REMOTE_ID));
         // Notify the active callbacks interface (the activity, if the
         // fragment is attached to one) that an item has been selected.
-        mCallbacks.onItemSelected(DummyContent.ITEMS.get(position).id);
+        //
+        mCallbacks.onItemSelected(table);
     }
 
     @Override

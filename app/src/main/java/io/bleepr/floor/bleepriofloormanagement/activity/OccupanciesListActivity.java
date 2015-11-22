@@ -12,6 +12,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import io.bleepr.floor.bleepriofloormanagement.ChangeCallbacks;
 import io.bleepr.floor.bleepriofloormanagement.R;
 import io.bleepr.floor.bleepriofloormanagement.fragment.OccupanciesListFragment;
 import io.bleepr.floor.bleepriofloormanagement.fragment.OrderDetailFragment;
@@ -20,22 +21,26 @@ import io.bleepr.floor.bleepriofloormanagement.service.BleeprBackendQueryService
 
 public class OccupanciesListActivity extends AppCompatActivity implements OccupanciesListFragment.Callbacks {
 
+    public static final String EXTRA_TABLE_ID = "io.bleepr.bleepriofloormanagement.TABLE_ID";
+
+    public ChangeCallbacks callbacks;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_occupancies_list);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        toolbar.setTitle("Occupancies");
+        getSupportActionBar().setTitle("Occupancies");
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        Intent sender = getIntent();
+        int tableID = sender.getIntExtra(EXTRA_TABLE_ID, -1);
+
+        OccupanciesListFragment frag = ((OccupanciesListFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.occupancies_list));
+
+        callbacks = (ChangeCallbacks)frag;
+        callbacks.updateTableID(tableID);
     }
 
     @Override
@@ -51,7 +56,6 @@ public class OccupanciesListActivity extends AppCompatActivity implements Occupa
             case R.id.action_refresh:
                 // Kick off refresh
                 BleeprBackendQueryService.startRefresh(getApplicationContext(), null);
-                Toast.makeText(getApplicationContext(), "Refresh initiated", Toast.LENGTH_LONG).show();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

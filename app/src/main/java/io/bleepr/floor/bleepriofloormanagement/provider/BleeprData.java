@@ -10,7 +10,7 @@ import android.provider.BaseColumns;
  */
 public class BleeprData extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "bleepr.db";
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 5;
 
     BleeprData(Context ctx){
         super(ctx, DATABASE_NAME, null, DATABASE_VERSION);
@@ -23,14 +23,14 @@ public class BleeprData extends SQLiteOpenHelper {
                     + BleeprConstants.TABLES_NAME + " TEXT, "
                     + BleeprConstants.TABLES_XPOS + " REAL, "
                     + BleeprConstants.TABLES_YPOS + " REAL, "
-                    + BleeprConstants.TABLES_MAP_ID + " INTEGER, "
+                    + BleeprConstants.TABLES_CAPACITY + " INTEGER, "
                     + BleeprConstants.TABLES_REMOTE_ID + " INTEGER);");
 
         db.execSQL("CREATE TABLE " + BleeprConstants.ORDERS_TABLE + " ("
                     + BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                     + BleeprConstants.ORDERS_STATUS + " TEXT, "
-                    + BleeprConstants.ORDERS_CARD_ID + " INTEGER, "
-                    + BleeprConstants.ORDERS_CUSTOMER_ID + " INTEGER, "
+                    + BleeprConstants.ORDERS_CARD_ID + " TEXT, "
+                    + BleeprConstants.ORDERS_PLACED_AT + " TEXT, "
                     + BleeprConstants.ORDERS_TABLE_ID + " INTEGER, "
                     + BleeprConstants.ORDERS_REMOTE_ID + " INTEGER);");
 

@@ -9,8 +9,11 @@ import android.support.v4.os.ResultReceiver;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import io.bleepr.floor.bleepriofloormanagement.network.RequestQueueBox;
@@ -28,9 +31,11 @@ public class BleeprBackendQueryService extends IntentService {
 
     private static final String EXTRA_CALLBACK = "io.bleepr.floor.bleepriofloormanagement.service.extra.CALLBACK";
 
-    private static final String TABLES_API_URL = "";
-    private static final String ORDERS_API_URL = "";
-    private static final String OCCUPANCIES_API_URL = "";
+    public static final String TABLES_API_URL = "http://burger.bleepr.io/tables.json";
+    public static final String ORDERS_API_URL = "http://burger.bleepr.io/tables/%d/orders.json";
+    public static final String OCCUPANCIES_API_URL = "http://burger.bleepr.io/tables/%d/occupancies/current.json";
+    public static final String OCCUPANCIES_FUTURE_API_URL = "http://burger.bleepr.io/tables/%d/occupancies/bookings.json";
+    public static final String CUSTOMER_API_URL = "http://burger.bleepr.io/customers/%d.json";
 
     /**
      * Starts this service to perform action Foo with the given parameters. If
@@ -66,42 +71,8 @@ public class BleeprBackendQueryService extends IntentService {
      * parameters.
      */
     private void handleActionRefresh(ResultReceiver callback) {
-        JsonObjectRequest tables = new JsonObjectRequest(Request.Method.GET, TABLES_API_URL, null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        int remoteID = 0;
-                        JsonObjectRequest occupancies = new JsonObjectRequest(Request.Method.GET, String.format(OCCUPANCIES_API_URL, remoteID), null,
-                                new Response.Listener<JSONObject>() {
-                                    @Override
-                                    public void onResponse(JSONObject response) {
-
-                                    }
-                                },
-                                new Response.ErrorListener() {
-                                    @Override
-                                    public void onErrorResponse(VolleyError error) {
-
-                                    }
-                                }
-                        );
-
-                        JsonObjectRequest orders = new JsonObjectRequest(Request.Method.GET, String.format(ORDERS_API_URL, remoteID), null,
-                                new Response.Listener<JSONObject>() {
-                                    @Override
-                                    public void onResponse(JSONObject response) {
-
-                                    }
-                                },
-                                new Response.ErrorListener() {
-                                    @Override
-                                    public void onErrorResponse(VolleyError error) {
-
-                                    }
-                                }
-                        );
-                    }
-                },
+        JsonArrayRequest tables = new JsonArrayRequest(Request.Method.GET, TABLES_API_URL, null,
+                new TableResponseListener(getApplicationContext()),
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {

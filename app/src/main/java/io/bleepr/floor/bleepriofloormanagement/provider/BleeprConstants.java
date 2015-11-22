@@ -18,7 +18,7 @@ public class BleeprConstants {
     public static final String TABLES_NAME = "name",
             TABLES_XPOS = "xpos",
             TABLES_YPOS = "ypos",
-            TABLES_MAP_ID = "map_id",
+            TABLES_CAPACITY = "capacity",
             TABLES_REMOTE_ID = "remote_id";
 
     public static final String OCCUPANCIES_PREBOOKED = "prebooked",
@@ -31,8 +31,8 @@ public class BleeprConstants {
             OCCUPANCIES_REMOTE_ID = "remote_id";
 
     public static final String ORDERS_STATUS = "status",
-            ORDERS_CUSTOMER_ID = "customer_id",
             ORDERS_CARD_ID = "card_id",
             ORDERS_TABLE_ID = "table_id",
-            ORDERS_REMOTE_ID = "remote_id";
+            ORDERS_REMOTE_ID = "remote_id",
+            ORDERS_PLACED_AT = "placed";
 }

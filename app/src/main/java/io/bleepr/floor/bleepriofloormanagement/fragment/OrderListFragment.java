@@ -16,6 +16,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 
+import io.bleepr.floor.bleepriofloormanagement.ChangeCallbacks;
 import io.bleepr.floor.bleepriofloormanagement.dummy.DummyContent;
 import io.bleepr.floor.bleepriofloormanagement.provider.BleeprConstants;
 
@@ -28,7 +29,7 @@ import io.bleepr.floor.bleepriofloormanagement.provider.BleeprConstants;
  * Activities containing this fragment MUST implement the {@link Callbacks}
  * interface.
  */
-public class OrderListFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class OrderListFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor>, ChangeCallbacks {
 
     /**
      * The serialization (saved instance state) Bundle key representing the
@@ -47,12 +48,20 @@ public class OrderListFragment extends ListFragment implements LoaderManager.Loa
      */
     private int mActivatedPosition = ListView.INVALID_POSITION;
 
+    private int tableID = -1;
+
     static final String[] PROJECTION = new String[] {BaseColumns._ID,
             BleeprConstants.ORDERS_TABLE_ID, BleeprConstants.ORDERS_REMOTE_ID};
 
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        if(tableID != -1){
+            String selection = "(" + BleeprConstants.ORDERS_TABLE_ID + "=" + tableID + ")";
+            return new CursorLoader(getActivity(), BleeprConstants.ORDERS_CONTENT_URI,
+                    PROJECTION, selection, null, null);
+        }
+
         return new CursorLoader(getActivity(), BleeprConstants.ORDERS_CONTENT_URI,
                 PROJECTION, null, null, null);
     }
@@ -67,6 +76,12 @@ public class OrderListFragment extends ListFragment implements LoaderManager.Loa
         cursorAdapter.swapCursor(null);
     }
 
+    @Override
+    public void updateTableID(int id) {
+        tableID = id;
+        getLoaderManager().restartLoader(0, null, this);
+    }
+
     /**
      * A callback interface that all activities containing this fragment must
      * implement. This mechanism allows activities to be notified of item
@@ -76,7 +91,8 @@ public class OrderListFragment extends ListFragment implements LoaderManager.Loa
         /**
          * Callback for when an item has been selected.
          */
-        public void onItemSelected(String id);
+        public void onItemSelected(int id);
+        public int getTableID();
     }
 
     /**
@@ -85,7 +101,11 @@ public class OrderListFragment extends ListFragment implements LoaderManager.Loa
      */
     private static Callbacks sDummyCallbacks = new Callbacks() {
         @Override
-        public void onItemSelected(String id) {
+        public void onItemSelected(int id) {
+        }
+
+        public int getTableID(){
+            return -1;
         }
     };
 
@@ -109,6 +129,8 @@ public class OrderListFragment extends ListFragment implements LoaderManager.Loa
                 new int[]{android.R.id.text1}, 0);
 
         setListAdapter(cursorAdapter);
+
+        tableID = mCallbacks.getTableID();
 
         getLoaderManager().initLoader(0, null, this);
     }
@@ -160,9 +182,12 @@ public class OrderListFragment extends ListFragment implements LoaderManager.Loa
     public void onListItemClick(ListView listView, View view, int position, long id) {
         super.onListItemClick(listView, view, position, id);
 
+        Cursor cur = (Cursor)getListAdapter().getItem(position);
+        int table = cur.getInt(cur.getColumnIndex(BleeprConstants.ORDERS_REMOTE_ID));
         // Notify the active callbacks interface (the activity, if the
         // fragment is attached to one) that an item has been selected.
-        mCallbacks.onItemSelected(DummyContent.ITEMS.get(position).id);
+        //
+        mCallbacks.onItemSelected(table);
     }
 
     @Override

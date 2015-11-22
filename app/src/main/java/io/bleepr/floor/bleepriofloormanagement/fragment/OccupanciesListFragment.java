@@ -1,7 +1,9 @@
 package io.bleepr.floor.bleepriofloormanagement.fragment;
 
 import android.app.Activity;
+import android.content.ContentUris;
 import android.database.Cursor;
+import android.net.Uri;
 import android.provider.BaseColumns;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
@@ -15,10 +17,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.CursorAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 
+import io.bleepr.floor.bleepriofloormanagement.APIOccupancyAdapter;
+import io.bleepr.floor.bleepriofloormanagement.ChangeCallbacks;
 import io.bleepr.floor.bleepriofloormanagement.R;
 import io.bleepr.floor.bleepriofloormanagement.dummy.DummyContent;
 import io.bleepr.floor.bleepriofloormanagement.provider.BleeprConstants;
@@ -26,7 +31,7 @@ import io.bleepr.floor.bleepriofloormanagement.provider.BleeprConstants;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class OccupanciesListFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class OccupanciesListFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor>, ChangeCallbacks {
 
     /**
      * The serialization (saved instance state) Bundle key representing the
@@ -45,15 +50,13 @@ public class OccupanciesListFragment extends ListFragment implements LoaderManag
      */
     private int mActivatedPosition = ListView.INVALID_POSITION;
 
-    static final String[] PROJECTION = new String[] {BaseColumns._ID,
-            BleeprConstants.OCCUPANCIES_CUSTOMER_FIRST_NAME};
+    private int tableID;
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        // TODO: add selection to pick only current and future occupancies
         // TODO: Change projection to get all the fields we actually want out
-        return new CursorLoader(getActivity(), BleeprConstants.ORDERS_CONTENT_URI,
-                PROJECTION, null, null, null);
+        return new CursorLoader(getActivity(), ContentUris.withAppendedId(Uri.withAppendedPath(BleeprConstants.OCCUPANCIES_CONTENT_URI, "by-table"), tableID),
+                null, null, null, null);
     }
 
     @Override
@@ -66,7 +69,13 @@ public class OccupanciesListFragment extends ListFragment implements LoaderManag
         cursorAdapter.swapCursor(null);
     }
 
-    private SimpleCursorAdapter cursorAdapter;
+    private CursorAdapter cursorAdapter;
+
+    @Override
+    public void updateTableID(int id) {
+        tableID = id;
+        getLoaderManager().restartLoader(0, null, this);
+    }
 
     /**
      * A callback interface that all activities containing this fragment must
@@ -101,11 +110,7 @@ public class OccupanciesListFragment extends ListFragment implements LoaderManag
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        cursorAdapter = new SimpleCursorAdapter(getActivity(),
-                android.R.layout.simple_list_item_activated_1,
-                null,
-                new String[]{BleeprConstants.OCCUPANCIES_CUSTOMER_FIRST_NAME},
-                new int[]{android.R.id.text1}, 0);
+        cursorAdapter = new APIOccupancyAdapter(getActivity(), null, 0);
 
         setListAdapter(cursorAdapter);
 
