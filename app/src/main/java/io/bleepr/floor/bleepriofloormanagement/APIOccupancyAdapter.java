@@ -42,7 +42,19 @@ public class APIOccupancyAdapter extends CursorAdapter {
 
         String firstName = cursor.getString(cursor.getColumnIndex(BleeprConstants.OCCUPANCIES_CUSTOMER_FIRST_NAME));
         String lastName = cursor.getString(cursor.getColumnIndex(BleeprConstants.OCCUPANCIES_CUSTOMER_LAST_NAME));
-        String name = String.format("%s, %s", lastName, firstName);
+
+        String name;
+        if(firstName == null || firstName.equals("null")){
+            if(lastName == null || lastName.equals("null")){
+                name = "Unassigned";
+            } else {
+                name = lastName;
+            }
+        } else if(lastName == null ||lastName.equals("null")){
+            name = firstName;
+        } else {
+            name = String.format("%s, %s", lastName, firstName);
+        }
 
         tvName.setText(name);
 
@@ -57,18 +69,21 @@ public class APIOccupancyAdapter extends CursorAdapter {
 
             tvStatus.setText("Pre-booked");
         } else {
+            layout.setBackgroundColor(Color.WHITE);
+            tvName.setTextColor(Color.BLACK);
+            tvStatus.setTextColor(Color.BLACK);
+            tvStart.setTextColor(Color.BLACK);
+            tvEnd.setTextColor(Color.BLACK);
             tvStatus.setText("Unreserved");
         }
 
         DateTime start = new DateTime(cursor.getString(cursor.getColumnIndex(BleeprConstants.OCCUPANCIES_START)));
-        DateTime end = new DateTime(cursor.getString(cursor.getColumnIndex(BleeprConstants.OCCUPANCIES_END)));
 
         DateTime now = DateTime.now();
         Period startDiff = new Period(now, start);
-        Period endDiff = new Period(now, end);
 
-        DateTimeFormatter sameDayFmt = DateTimeFormat.forPattern("h:ma");
-        DateTimeFormatter diffDayFmt = DateTimeFormat.forPattern("d/M/yy h:ma");
+        DateTimeFormatter sameDayFmt = DateTimeFormat.forPattern("h:mma");
+        DateTimeFormatter diffDayFmt = DateTimeFormat.forPattern("d/M/yy h:mma");
 
         String str;
         if(startDiff.getDays() > 1) {
@@ -78,16 +93,26 @@ public class APIOccupancyAdapter extends CursorAdapter {
             str = sameDayFmt.print(start);
         }
 
-        String stStr = str.replace("a.m.", "AM").replace("p.m.","PM");
+        String stStr = str.replace("a.m.", "AM").replace("p.m.", "PM");
         tvStart.setText(stStr);
 
-        if(endDiff.getDays() > 1) {
-            str = diffDayFmt.print(end);
-        } else {
-            str = sameDayFmt.print(end);
-        }
+        String endDate = cursor.getString(cursor.getColumnIndex(BleeprConstants.OCCUPANCIES_END));
+        if(endDate != null && !endDate.equals("null")) {
 
-        stStr = str.replace("a.m.", "AM").replace("p.m.","PM");
-        tvEnd.setText(stStr);
+            DateTime end = new DateTime(endDate);
+
+            Period endDiff = new Period(now, end);
+
+            if (endDiff.getDays() > 1) {
+                str = diffDayFmt.print(end);
+            } else {
+                str = sameDayFmt.print(end);
+            }
+
+            stStr = str.replace("a.m.", "AM").replace("p.m.", "PM");
+            tvEnd.setText("- " + stStr);
+        } else {
+            tvEnd.setText("");
+        }
     }
 }
