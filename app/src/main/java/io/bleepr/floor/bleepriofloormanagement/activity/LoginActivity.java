@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.bleepr.floor.bleepriofloormanagement.R;
+import io.bleepr.floor.bleepriofloormanagement.service.BleeprBackendQueryService;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
@@ -55,7 +56,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      * TODO: remove after connecting to a real authentication system.
      */
     private static final String[] DUMMY_CREDENTIALS = new String[]{
-            "foo@example.com:hello", "bar@example.com:world"
+            "foo@example.com:hello", "bar@example.com:world",
+            "book@peden.pizza:ketchup"
     };
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
@@ -342,6 +344,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             showProgress(false);
 
             if (success) {
+                BleeprBackendQueryService.startRefresh(getApplicationContext(), null);
                 mActivity.startActivity(new Intent(mActivity, PostLoginMenuActivity.class));
             } else {
                 mPasswordView.setError(getString(R.string.error_incorrect_password));

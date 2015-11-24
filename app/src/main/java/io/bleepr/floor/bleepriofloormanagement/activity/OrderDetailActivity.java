@@ -1,5 +1,8 @@
 package io.bleepr.floor.bleepriofloormanagement.activity;
 
+import android.content.ContentUris;
+import android.content.ContentValues;
+import android.database.Cursor;
 import android.support.v7.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,6 +16,8 @@ import android.widget.Toast;
 
 import io.bleepr.floor.bleepriofloormanagement.fragment.OrderDetailFragment;
 import io.bleepr.floor.bleepriofloormanagement.R;
+import io.bleepr.floor.bleepriofloormanagement.provider.BleeprConstants;
+import io.bleepr.floor.bleepriofloormanagement.service.BleeprBackendQueryService;
 
 /**
  * An activity representing a single Order detail screen. This
@@ -25,7 +30,9 @@ import io.bleepr.floor.bleepriofloormanagement.R;
  */
 public class OrderDetailActivity extends AppCompatActivity {
 
-    private int tableId;
+    private int orderId;
+    private String orderStatus;
+    private OrderDetailFragment fragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,18 +40,6 @@ public class OrderDetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_order_detail);
         Toolbar toolbar = (Toolbar) findViewById(R.id.detail_toolbar);
         setSupportActionBar(toolbar);
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "WIP: Mark order as in progress", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-
-        // Show the Up button in the action bar.
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         // savedInstanceState is non-null when there is fragment state
         // saved from previous configurations of this activity
@@ -59,14 +54,61 @@ public class OrderDetailActivity extends AppCompatActivity {
             // Create the detail fragment and add it to the activity
             // using a fragment transaction.
             Bundle arguments = new Bundle();
-            tableId = getIntent().getIntExtra(OrderDetailFragment.ARG_ITEM_ID, -1);
-            arguments.putInt(OrderDetailFragment.ARG_ITEM_ID, tableId);
-            OrderDetailFragment fragment = new OrderDetailFragment();
+            orderId = getIntent().getIntExtra(OrderDetailFragment.ARG_ITEM_ID, -1);
+            arguments.putInt(OrderDetailFragment.ARG_ITEM_ID, orderId);
+            fragment = new OrderDetailFragment();
             fragment.setArguments(arguments);
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.order_detail_container, fragment)
                     .commit();
         }
+
+        Cursor cur = getApplicationContext().getContentResolver().query(ContentUris.withAppendedId(BleeprConstants.ORDERS_CONTENT_URI, orderId), null, null, null, null);
+        cur.moveToFirst();
+        orderStatus = cur.getString(cur.getColumnIndex(BleeprConstants.ORDERS_STATUS));
+
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        if(orderStatus.equals("served")) {
+            fab.hide();
+        } else {
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                    String prettyStatus = "";
+                    switch (orderStatus) {
+                        case "open":
+                            prettyStatus = "In Progress";
+                            orderStatus = "progress";
+                            break;
+                        case "progress":
+                            prettyStatus = "Ready";
+                            orderStatus = "complete";
+                            break;
+                        case "complete":
+                            prettyStatus = "Served";
+                            orderStatus = "served";
+                            view.setVisibility(View.INVISIBLE);
+                            break;
+                        case "served":
+                            break;
+                    }
+
+                    ContentValues values = new ContentValues();
+                    values.put(BleeprConstants.ORDERS_STATUS, orderStatus);
+                    view.getContext().getContentResolver().update(ContentUris.withAppendedId(BleeprConstants.ORDERS_CONTENT_URI, orderId), values, null, null);
+                    BleeprBackendQueryService.updateOrderRemote(view.getContext().getApplicationContext(), orderId, null);
+
+                    Snackbar.make(view, String.format("Order marked as \"%s\"", prettyStatus), Snackbar.LENGTH_LONG)
+                            .show();
+
+                    fragment.reloadData(true);
+                }
+            });
+        }
+
+        // Show the Up button in the action bar.
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     @Override

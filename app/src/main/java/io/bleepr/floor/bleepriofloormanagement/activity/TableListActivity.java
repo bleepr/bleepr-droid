@@ -66,6 +66,8 @@ public class TableListActivity extends AppCompatActivity
                     .setActivateOnItemClick(true);
         }
 
+        BleeprBackendQueryService.startRefresh(getApplicationContext(), null);
+
         // TODO: If exposing deep links into your app, handle intents here.
     }
 

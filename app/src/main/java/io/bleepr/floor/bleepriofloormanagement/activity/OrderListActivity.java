@@ -76,6 +76,8 @@ public class OrderListActivity extends AppCompatActivity
             frag.setActivateOnItemClick(true);
         }
 
+        BleeprBackendQueryService.startRefresh(getApplicationContext(), null);
+
         // TODO: If exposing deep links into your app, handle intents here.
     }
 

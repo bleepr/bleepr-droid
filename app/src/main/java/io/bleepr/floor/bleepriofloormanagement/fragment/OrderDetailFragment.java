@@ -46,6 +46,8 @@ public class OrderDetailFragment extends Fragment {
     private int tableID;
     private DateTime placed;
     private String tableName;
+    private String orderStatus;
+    private int id;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -58,15 +60,36 @@ public class OrderDetailFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        reloadData(false);
+
+    }
+
+    public void reloadData(boolean redraw){
         if (getArguments().containsKey(ARG_ITEM_ID)) {
             // Load the dummy content specified by the fragment
             // arguments. In a real-world scenario, use a Loader
             // to load content from a content provider.
-            int id = getArguments().getInt(ARG_ITEM_ID);
+            id = getArguments().getInt(ARG_ITEM_ID);
             Cursor cur = getContext().getApplicationContext().getContentResolver().query(ContentUris.withAppendedId(BleeprConstants.ORDERS_CONTENT_URI, id), null, null, null, null);
             cur.moveToFirst();
             placed = new DateTime(cur.getString(cur.getColumnIndex(BleeprConstants.ORDERS_PLACED_AT)));
             tableID = cur.getInt(cur.getColumnIndex(BleeprConstants.ORDERS_TABLE_ID));
+            orderStatus = cur.getString(cur.getColumnIndex(BleeprConstants.ORDERS_STATUS));
+
+            switch (orderStatus) {
+                case "open":
+                    orderStatus = "Open";
+                    break;
+                case "progress":
+                    orderStatus = "In Progress";
+                    break;
+                case "complete":
+                    orderStatus = "Ready";
+                    break;
+                case "served":
+                    orderStatus = "Served";
+                    break;
+            }
 
             cur.close();
             cur = getContext().getApplicationContext().getContentResolver().query(ContentUris.withAppendedId(BleeprConstants.TABLES_CONTENT_URI, tableID), null, null, null, null);
@@ -78,6 +101,30 @@ public class OrderDetailFragment extends Fragment {
             CollapsingToolbarLayout appBarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
             if (appBarLayout != null) {
                 appBarLayout.setTitle(String.format("Order %d", id));
+            }
+
+            if(redraw){
+                View rootView = getView();
+                TextView tvFor = (TextView)rootView.findViewById(R.id.order_table);
+                tvFor.setText(String.format("Table %s", tableName));
+
+                TextView tvPlaced = (TextView)rootView.findViewById(R.id.order_time);
+                DateTime now = DateTime.now();
+                Period tillNow = new Period(placed, now);
+
+                String str;
+                if(tillNow.getDays() > 0){
+                    str = String.format("%d hours ago", tillNow.getDays());
+                } else if (tillNow.getHours() > 0) {
+                    str = String.format("%d hours ago", tillNow.getHours());
+                } else {
+                    str = String.format("%d minutes ago", tillNow.getMinutes());
+                }
+                tvPlaced.setText(str);
+
+
+                TextView tvStatus = (TextView)rootView.findViewById(R.id.statusLabel);
+                tvStatus.setText(orderStatus);
             }
         }
     }
@@ -114,6 +161,9 @@ public class OrderDetailFragment extends Fragment {
                 startActivity(tableDetail);
             }
         });
+
+        TextView tvStatus = (TextView)rootView.findViewById(R.id.statusLabel);
+        tvStatus.setText(orderStatus);
 
         return rootView;
     }
